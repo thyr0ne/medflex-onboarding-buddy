@@ -34,12 +34,16 @@ const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
 
 const Tags = ({ items }: { items: string[] }) => (
   <div className="flex flex-wrap gap-1 justify-end">
-    {items.map((t) => (
+    {items.length === 0 ? <span className="text-sm text-muted-foreground">–</span> : items.map((t) => (
       <span key={t} className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
         {t}
       </span>
     ))}
   </div>
+);
+
+const TextBlock = ({ text }: { text: string }) => (
+  <div className="mt-1 p-2 rounded bg-muted text-sm text-foreground whitespace-pre-wrap">{text}</div>
 );
 
 const StepSummary = ({ data, onExportPdf }: Props) => {
@@ -63,39 +67,63 @@ const StepSummary = ({ data, onExportPdf }: Props) => {
           <Row label="Datenschutz Website" value={<BoolBadge value={data.datenschutzWebsite} />} />
           <Row label="Datenschutz Ansage" value={<BoolBadge value={data.datenschutzAnsage} />} />
           <Row label="Hinweis 112" value={<BoolBadge value={data.hinweis112} />} />
-          {data.begruessung && (
-            <div className="mt-2 p-3 rounded-lg bg-muted text-sm text-foreground italic">
-              "{data.begruessung}"
-            </div>
-          )}
+          {data.begruessung && <TextBlock text={data.begruessung} />}
         </Section>
 
         <Section title="Anrufer-Typen">
           <Row label="Neupatienten" value={<BoolBadge value={data.neupatientenAufnahme} />} />
+          {data.neupatientenRegeln && <TextBlock text={data.neupatientenRegeln} />}
           <Row label="Versicherungsarten" value={<Tags items={data.versicherungsarten} />} />
+          <Row label="Patientendaten" value={<Tags items={data.patientendatenFelder} />} />
+          <Row label="Vertreterdaten" value={<BoolBadge value={data.vertreterdatenErfassen} />} />
           <Row label="Zuweiser durchstellen" value={<BoolBadge value={data.zuweiserDurchstellen} />} />
           {data.zuweiserDurchstellen && data.zuweiserTelefon && (
             <Row label="Zuweiser-Telefon" value={data.zuweiserTelefon} />
           )}
+          <Row label="Rückrufer-Handling" value={<BoolBadge value={data.rueckruferHandling} />} />
+          {data.rueckruferHandling && data.rueckruferTelefon && (
+            <Row label="Rückrufer-Telefon" value={data.rueckruferTelefon} />
+          )}
+          <Row label="BG-Fall Behandlung" value={<BoolBadge value={data.bgFallHandling} />} />
+          {data.bgFallHandling && data.bgFallHinweis && <TextBlock text={data.bgFallHinweis} />}
         </Section>
 
         <Section title="Notfallbearbeitung">
           <Row label="Intern bearbeitet" value={<BoolBadge value={data.notfaelleIntern} />} />
           <Row label="Schlüsselwörter" value={<Tags items={data.notfallSchlagwoerter} />} />
           {data.notfallTelefon && <Row label="Notfallnummer" value={data.notfallTelefon} />}
+          <Row label="Akutsprechstunde" value={<BoolBadge value={data.akutsprechstunde} />} />
+          <Row label="Notfall-Datenerfassung" value={<Tags items={data.notfallDatenerfassung} />} />
         </Section>
 
         <Section title="Anfragetypen">
-          <Row label="Terminarten" value={data.terminarten.length > 0 ? <Tags items={data.terminarten} /> : '–'} />
+          <Row label="Terminarten" value={<Tags items={data.terminarten} />} />
           <Row label="Termin-Datenerfassung" value={<Tags items={data.terminDatenerfassung} />} />
-          {data.terminRegeln && <Row label="Terminregeln" value={data.terminRegeln} />}
+          {data.terminRegeln && <TextBlock text={data.terminRegeln} />}
+          {data.onlineBuchungHinweis && <Row label="Online-Buchung" value={data.onlineBuchungHinweis} />}
+          <Row label="Terminabsage/-änderung" value={<BoolBadge value={data.terminAbsage} />} />
+          {data.terminAbsage && data.terminAbsageRegeln && <TextBlock text={data.terminAbsageRegeln} />}
           <Row label="Rezept für" value={<Tags items={data.rezeptVerfuegbar} />} />
+          {data.rezeptRegeln && <TextBlock text={data.rezeptRegeln} />}
+          <Row label="Rezept-Datenerfassung" value={<Tags items={data.rezeptDatenerfassung} />} />
+          {data.rezeptAbholung && <TextBlock text={data.rezeptAbholung} />}
           <Row label="Befund für" value={<Tags items={data.befundVerfuegbar} />} />
+          {data.befundRegeln && <TextBlock text={data.befundRegeln} />}
+          <Row label="Befund-Datenerfassung" value={<Tags items={data.befundDatenerfassung} />} />
+          <Row label="Überweisung" value={<BoolBadge value={data.ueberweisung} />} />
+          {data.ueberweisung && data.ueberweisungRegeln && <TextBlock text={data.ueberweisungRegeln} />}
+          <Row label="AU / Krankschreibung" value={<BoolBadge value={data.auKrankschreibung} />} />
+          {data.auKrankschreibung && data.auRegeln && <TextBlock text={data.auRegeln} />}
           <Row label="Sonstiges Anliegen" value={<BoolBadge value={data.sonstigesAnliegen} />} />
+          <Row label="Weiterleitung Gespräch" value={<BoolBadge value={data.weiterleitungBeiGespraech} />} />
+          {data.weiterleitungBeiGespraech && data.weiterleitungTelefon && (
+            <Row label="Weiterleitungs-Nr." value={data.weiterleitungTelefon} />
+          )}
         </Section>
 
         <Section title="Knowledge Base">
           <Row label="Adresse" value={data.adresse || '–'} />
+          {data.anfahrt && <TextBlock text={data.anfahrt} />}
           <Row label="Öffnungszeiten" value={data.oeffnungszeiten || '–'} />
           <Row label="Parkhinweise" value={data.parkhinweise || '–'} />
           <Row label="Behandler" value={data.behandlerListe || '–'} />

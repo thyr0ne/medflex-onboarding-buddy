@@ -16,11 +16,20 @@ const StepKnowledge = ({ data, onChange }: Props) => {
       description="Informationen, die der Assistent auf Nachfrage mitteilen kann."
       image={stepImage}
     >
-      <FormField label="Adresse / Anfahrtsbeschreibung">
+      <FormField label="Adresse">
         <Textarea
           value={data.adresse}
           onChange={(e) => onChange({ adresse: e.target.value })}
-          placeholder="z.B. Musterstraße 1, 80331 München. Erreichbar mit U-Bahn Linie U3, Station Marienplatz."
+          placeholder="z.B. Musterstraße 1, 80331 München"
+          rows={2}
+        />
+      </FormField>
+
+      <FormField label="Anfahrtsbeschreibung">
+        <Textarea
+          value={data.anfahrt}
+          onChange={(e) => onChange({ anfahrt: e.target.value })}
+          placeholder="z.B. Erreichbar mit U-Bahn Linie U3, Station Marienplatz. Von der A7 Ausfahrt Kassel-Ost..."
           rows={3}
         />
       </FormField>
@@ -29,7 +38,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.oeffnungszeiten}
           onChange={(e) => onChange({ oeffnungszeiten: e.target.value })}
-          placeholder="z.B. Mo-Fr 8:00-18:00, Sa nach Vereinbarung"
+          placeholder="z.B. Mo-Fr 8:00-12:30, 14:00-17:00; Mi 7:00-12:00; Sa nach Vereinbarung"
           rows={3}
         />
       </FormField>
@@ -47,7 +56,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.behandlerListe}
           onChange={(e) => onChange({ behandlerListe: e.target.value })}
-          placeholder="z.B. Dr. Müller (Allgemeinmedizin), Dr. Schmidt (Orthopädie)"
+          placeholder="z.B. Dr. Müller (Allgemeinmedizin), Dr. Schmidt (Orthopädie), Barbara Steuer (Diabetologie)"
           rows={3}
         />
       </FormField>
@@ -56,7 +65,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.leistungen}
           onChange={(e) => onChange({ leistungen: e.target.value })}
-          placeholder="z.B. Vorsorgeuntersuchungen, Labordiagnostik, Schmerztherapie"
+          placeholder="z.B. Vorsorgeuntersuchungen, Labordiagnostik, Schmerztherapie, Chirotherapie, MRT"
           rows={3}
         />
       </FormField>
@@ -65,7 +74,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.besonderheiten}
           onChange={(e) => onChange({ besonderheiten: e.target.value })}
-          placeholder="z.B. Barrierefreier Zugang, Kinderecke im Wartezimmer"
+          placeholder="z.B. Barrierefreier Zugang, Offene Sprechstunde für Notfälle täglich 8-9 Uhr"
           rows={2}
         />
       </FormField>

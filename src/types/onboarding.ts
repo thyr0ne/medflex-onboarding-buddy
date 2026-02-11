@@ -9,35 +9,78 @@ export interface OnboardingData {
   sprachen: string[];
   stimme: string;
   
-  // Step 2: Datenschutz & Begrüßung
+  // Step 2: Datenschutz & Anrufer-Typen
   datenschutzWebsite: boolean;
   datenschutzAnsage: boolean;
   begruessung: string;
   hinweis112: boolean;
   
-  // Step 3: Anrufer-Typen
+  // Patientenaufnahme
   neupatientenAufnahme: boolean;
+  neupatientenRegeln: string;
   versicherungsarten: string[];
+  patientendatenFelder: string[];
   vertreterdatenErfassen: boolean;
+  
+  // Zuweiser
   zuweiserDurchstellen: boolean;
   zuweiserTelefon: string;
   
-  // Step 4: Notfallbearbeitung
+  // Rückrufer
+  rueckruferHandling: boolean;
+  rueckruferTelefon: string;
+  
+  // BG-Fall / Arbeitsunfälle
+  bgFallHandling: boolean;
+  bgFallHinweis: string;
+  
+  // Step 3: Notfallbearbeitung
   notfaelleIntern: boolean;
   notfallSchlagwoerter: string[];
   notfallTelefon: string;
+  notfallDatenerfassung: string[];
+  akutsprechstunde: boolean;
   
-  // Step 5: Anfragetypen
+  // Step 4: Anfragetypen
+  // Terminvereinbarung
   terminarten: string[];
   terminRegeln: string;
   terminDatenerfassung: string[];
+  onlineBuchungHinweis: string;
+  
+  // Termin absagen/ändern
+  terminAbsage: boolean;
+  terminAbsageRegeln: string;
+  
+  // Rezept
   rezeptVerfuegbar: string[];
   rezeptRegeln: string;
+  rezeptDatenerfassung: string[];
+  rezeptAbholung: string;
+  
+  // Befund
   befundVerfuegbar: string[];
+  befundRegeln: string;
+  befundDatenerfassung: string[];
+  
+  // Überweisung
+  ueberweisung: boolean;
+  ueberweisungRegeln: string;
+  
+  // AU / Krankschreibung
+  auKrankschreibung: boolean;
+  auRegeln: string;
+  
+  // Sonstiges
   sonstigesAnliegen: boolean;
   
-  // Step 6: Knowledge Base
+  // Weiterleitung bei persönlichem Gespräch
+  weiterleitungBeiGespraech: boolean;
+  weiterleitungTelefon: string;
+  
+  // Step 5: Knowledge Base
   adresse: string;
+  anfahrt: string;
   oeffnungszeiten: string;
   parkhinweise: string;
   behandlerListe: string;
@@ -59,24 +102,56 @@ export const defaultOnboardingData: OnboardingData = {
   hinweis112: true,
   
   neupatientenAufnahme: true,
+  neupatientenRegeln: '',
   versicherungsarten: ['Gesetzlich', 'Privat', 'Selbstzahler'],
+  patientendatenFelder: ['Vor- und Nachname', 'Geburtsdatum', 'Bestands-/Neupatient', 'Handynummer'],
   vertreterdatenErfassen: true,
+  
   zuweiserDurchstellen: true,
   zuweiserTelefon: '',
   
+  rueckruferHandling: false,
+  rueckruferTelefon: '',
+  
+  bgFallHandling: false,
+  bgFallHinweis: '',
+  
   notfaelleIntern: true,
-  notfallSchlagwoerter: ['Starke Schmerzen', 'Unfall', 'Akuter Notfall'],
+  notfallSchlagwoerter: ['Notfall', 'Akute Beschwerden'],
   notfallTelefon: '',
+  notfallDatenerfassung: [],
+  akutsprechstunde: false,
   
   terminarten: [],
   terminRegeln: '',
   terminDatenerfassung: ['Terminwunsch', 'Behandler', 'Grund für Termin'],
+  onlineBuchungHinweis: '',
+  
+  terminAbsage: true,
+  terminAbsageRegeln: '',
+  
   rezeptVerfuegbar: ['Stammpatienten'],
   rezeptRegeln: '',
+  rezeptDatenerfassung: ['Medikamentenname', 'Wirkstärke/Dosierung'],
+  rezeptAbholung: '',
+  
   befundVerfuegbar: ['Stammpatienten', 'Vertreter'],
+  befundRegeln: '',
+  befundDatenerfassung: ['Welcher Befund', 'Gewünschter Zustellweg'],
+  
+  ueberweisung: false,
+  ueberweisungRegeln: '',
+  
+  auKrankschreibung: false,
+  auRegeln: '',
+  
   sonstigesAnliegen: true,
   
+  weiterleitungBeiGespraech: false,
+  weiterleitungTelefon: '',
+  
   adresse: '',
+  anfahrt: '',
   oeffnungszeiten: '',
   parkhinweise: '',
   behandlerListe: '',
@@ -84,7 +159,7 @@ export const defaultOnboardingData: OnboardingData = {
   besonderheiten: '',
 };
 
-export const MLFX_VERSION = '1.0';
+export const MLFX_VERSION = '1.1';
 
 export interface MlfxFile {
   version: string;

@@ -37,19 +37,46 @@ const StepEmergency = ({ data, onChange }: Props) => {
         <TagInput
           tags={data.notfallSchlagwoerter}
           onChange={(notfallSchlagwoerter) => onChange({ notfallSchlagwoerter })}
-          placeholder="z.B. Starke Blutung"
+          placeholder="z.B. Starke Blutung, Brustschmerzen, Atemnot"
         />
       </FormField>
 
       {data.notfaelleIntern && (
-        <FormField label="Notfallnummer" hint="Darf nicht die reguläre Hauptnummer sein!">
-          <Input
-            value={data.notfallTelefon}
-            onChange={(e) => onChange({ notfallTelefon: e.target.value })}
-            placeholder="z.B. 089 12345680"
-          />
-        </FormField>
+        <>
+          <FormField label="Notfallnummer" hint="Darf nicht die reguläre Hauptnummer sein!">
+            <Input
+              value={data.notfallTelefon}
+              onChange={(e) => onChange({ notfallTelefon: e.target.value })}
+              placeholder="z.B. 089 12345680"
+            />
+          </FormField>
+
+          <FormField label="Akutsprechstunde anbieten?" hint="Differenzierung zwischen Akutsprechstunde und echtem Notfall">
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={data.akutsprechstunde}
+                onCheckedChange={(checked) => onChange({ akutsprechstunde: checked })}
+              />
+              <span className="text-sm text-muted-foreground">
+                {data.akutsprechstunde
+                  ? 'Ja – Frage ob Akutsprechstunde oder Notfall-Weiterleitung'
+                  : 'Nein – Direkte Weiterleitung bei Notfall'}
+              </span>
+            </div>
+          </FormField>
+        </>
       )}
+
+      <FormField
+        label="Notfall-Datenerfassung"
+        hint="Welche zusätzlichen Daten sollen bei Notfällen erfasst werden?"
+      >
+        <TagInput
+          tags={data.notfallDatenerfassung}
+          onChange={(notfallDatenerfassung) => onChange({ notfallDatenerfassung })}
+          placeholder="z.B. Art der Beschwerden, Dauer der Beschwerden"
+        />
+      </FormField>
     </StepCard>
   );
 };
