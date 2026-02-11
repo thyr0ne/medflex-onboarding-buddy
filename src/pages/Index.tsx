@@ -148,26 +148,49 @@ const Index = () => {
 
     addSection('Anrufer-Typen');
     addRow('Neupatienten', data.neupatientenAufnahme ? 'Ja' : 'Nein');
+    if (data.neupatientenRegeln) addRow('Neupatientenregeln', data.neupatientenRegeln);
     addRow('Versicherungen', data.versicherungsarten.join(', '));
+    addRow('Patientendaten', data.patientendatenFelder.join(', '));
+    addRow('Vertreterdaten', data.vertreterdatenErfassen ? 'Ja' : 'Nein');
     addRow('Zuweiser durchstellen', data.zuweiserDurchstellen ? 'Ja' : 'Nein');
     if (data.zuweiserTelefon) addRow('Zuweiser-Telefon', data.zuweiserTelefon);
+    addRow('Rückrufer-Handling', data.rueckruferHandling ? 'Ja' : 'Nein');
+    if (data.rueckruferTelefon) addRow('Rückrufer-Telefon', data.rueckruferTelefon);
+    addRow('BG-Fall Behandlung', data.bgFallHandling ? 'Ja' : 'Nein');
+    if (data.bgFallHinweis) addRow('BG-Fall Hinweis', data.bgFallHinweis);
 
     addSection('Notfallbearbeitung');
     addRow('Intern bearbeitet', data.notfaelleIntern ? 'Ja' : 'Nein');
     addRow('Schlüsselwörter', data.notfallSchlagwoerter.join(', '));
     if (data.notfallTelefon) addRow('Notfallnummer', data.notfallTelefon);
+    addRow('Akutsprechstunde', data.akutsprechstunde ? 'Ja' : 'Nein');
+    if (data.notfallDatenerfassung.length > 0) addRow('Notfall-Datenerfassung', data.notfallDatenerfassung.join(', '));
 
     addSection('Anfragetypen');
     addRow('Terminarten', data.terminarten.join(', '));
     addRow('Termin-Datenerfassung', data.terminDatenerfassung.join(', '));
     if (data.terminRegeln) addRow('Terminregeln', data.terminRegeln);
+    if (data.onlineBuchungHinweis) addRow('Online-Buchung', data.onlineBuchungHinweis);
+    addRow('Terminabsage/-änderung', data.terminAbsage ? 'Ja' : 'Nein');
+    if (data.terminAbsage && data.terminAbsageRegeln) addRow('Absage-Regeln', data.terminAbsageRegeln);
     addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
     if (data.rezeptRegeln) addRow('Rezeptregeln', data.rezeptRegeln);
+    if (data.rezeptDatenerfassung.length > 0) addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
+    if (data.rezeptAbholung) addRow('Rezeptabholung', data.rezeptAbholung);
     addRow('Befund für', data.befundVerfuegbar.join(', '));
+    if (data.befundRegeln) addRow('Befundregeln', data.befundRegeln);
+    if (data.befundDatenerfassung.length > 0) addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
+    addRow('Überweisung', data.ueberweisung ? 'Ja' : 'Nein');
+    if (data.ueberweisung && data.ueberweisungRegeln) addRow('Überweisungsregeln', data.ueberweisungRegeln);
+    addRow('AU / Krankschreibung', data.auKrankschreibung ? 'Ja' : 'Nein');
+    if (data.auKrankschreibung && data.auRegeln) addRow('AU-Regeln', data.auRegeln);
     addRow('Sonstiges', data.sonstigesAnliegen ? 'Ja' : 'Nein');
+    addRow('Weiterleitung Gespräch', data.weiterleitungBeiGespraech ? 'Ja' : 'Nein');
+    if (data.weiterleitungBeiGespraech && data.weiterleitungTelefon) addRow('Weiterleitungs-Nr.', data.weiterleitungTelefon);
 
     addSection('Knowledge Base');
     addRow('Adresse', data.adresse);
+    if (data.anfahrt) addRow('Anfahrt', data.anfahrt);
     addRow('Öffnungszeiten', data.oeffnungszeiten);
     addRow('Parkhinweise', data.parkhinweise);
     addRow('Behandler', data.behandlerListe);
