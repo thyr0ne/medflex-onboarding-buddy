@@ -47,7 +47,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.behandlerListe}
           onChange={(e) => onChange({ behandlerListe: e.target.value })}
-          placeholder="z.B. Dr. Müller (Zahnmedizin), Dr. Schmidt (KFO), Frau Weber (PZR)"
+          placeholder="z.B. Dr. Müller (Allgemeinmedizin), Dr. Schmidt (Orthopädie)"
           rows={3}
         />
       </FormField>
@@ -56,7 +56,7 @@ const StepKnowledge = ({ data, onChange }: Props) => {
         <Textarea
           value={data.leistungen}
           onChange={(e) => onChange({ leistungen: e.target.value })}
-          placeholder="z.B. Prophylaxe, Zahnersatz, Implantologie, Kieferorthopädie"
+          placeholder="z.B. Vorsorgeuntersuchungen, Labordiagnostik, Schmerztherapie"
           rows={3}
         />
       </FormField>

@@ -1,6 +1,9 @@
+export type Einrichtungstyp = 'Praxis' | 'MVZ' | 'Klinikum' | 'Sonstige';
+
 export interface OnboardingData {
   // Step 1: Allgemeine Informationen
-  praxisName: string;
+  einrichtungstyp: Einrichtungstyp;
+  einrichtungsName: string;
   fachbereich: string;
   telefonnummer: string;
   sprachen: string[];
@@ -43,8 +46,9 @@ export interface OnboardingData {
 }
 
 export const defaultOnboardingData: OnboardingData = {
-  praxisName: '',
-  fachbereich: 'Zahnmedizin',
+  einrichtungstyp: 'Praxis',
+  einrichtungsName: '',
+  fachbereich: '',
   telefonnummer: '',
   sprachen: ['Deutsch'],
   stimme: 'weiblich',
@@ -61,22 +65,14 @@ export const defaultOnboardingData: OnboardingData = {
   zuweiserTelefon: '',
   
   notfaelleIntern: true,
-  notfallSchlagwoerter: [
-    'Zahnersatz kaputt',
-    'Zahn abgebrochen',
-    'Füllung rausgefallen',
-    'Dicke Backe',
-    'Krone rausgefallen',
-    'Starke Schmerzen',
-    'Unfall',
-  ],
+  notfallSchlagwoerter: ['Starke Schmerzen', 'Unfall', 'Akuter Notfall'],
   notfallTelefon: '',
   
   terminarten: [],
   terminRegeln: '',
   terminDatenerfassung: ['Terminwunsch', 'Behandler', 'Grund für Termin'],
   rezeptVerfuegbar: ['Stammpatienten'],
-  rezeptRegeln: 'Medikament muss schon mal von der Praxis verordnet worden sein',
+  rezeptRegeln: '',
   befundVerfuegbar: ['Stammpatienten', 'Vertreter'],
   sonstigesAnliegen: true,
   
@@ -87,3 +83,11 @@ export const defaultOnboardingData: OnboardingData = {
   leistungen: '',
   besonderheiten: '',
 };
+
+export const MLFX_VERSION = '1.0';
+
+export interface MlfxFile {
+  version: string;
+  exportedAt: string;
+  data: OnboardingData;
+}

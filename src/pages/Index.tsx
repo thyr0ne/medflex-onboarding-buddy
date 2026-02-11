@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { OnboardingData, defaultOnboardingData } from '@/types/onboarding';
+import { useState, useCallback, useRef } from 'react';
+import { OnboardingData, defaultOnboardingData, MlfxFile, MLFX_VERSION } from '@/types/onboarding';
 import StepIndicator from '@/components/onboarding/StepIndicator';
 import StepGeneral from '@/components/onboarding/StepGeneral';
 import StepCallers from '@/components/onboarding/StepCallers';
@@ -8,7 +8,7 @@ import StepRequests from '@/components/onboarding/StepRequests';
 import StepKnowledge from '@/components/onboarding/StepKnowledge';
 import StepSummary from '@/components/onboarding/StepSummary';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Phone } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Phone, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 
@@ -24,6 +24,7 @@ const STEPS = [
 const Index = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [data, setData] = useState<OnboardingData>(defaultOnboardingData);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = useCallback((partial: Partial<OnboardingData>) => {
     setData((prev) => ({ ...prev, ...partial }));
@@ -37,6 +38,48 @@ const Index = () => {
     if (currentStep > 1) setCurrentStep((s) => s - 1);
   };
 
+  // ── .mlfx Export ──
+  const exportMlfx = useCallback(() => {
+    const mlfx: MlfxFile = {
+      version: MLFX_VERSION,
+      exportedAt: new Date().toISOString(),
+      data,
+    };
+    const blob = new Blob([JSON.stringify(mlfx, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(data.einrichtungsName || 'Konfiguration').replace(/\s+/g, '_')}.mlfx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Konfiguration exportiert (.mlfx)');
+  }, [data]);
+
+  // ── .mlfx Import ──
+  const importMlfx = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed: MlfxFile = JSON.parse(ev.target?.result as string);
+        if (!parsed.data || !parsed.version) {
+          toast.error('Ungültige .mlfx-Datei');
+          return;
+        }
+        setData({ ...defaultOnboardingData, ...parsed.data });
+        setCurrentStep(1);
+        toast.success('Konfiguration erfolgreich geladen!');
+      } catch {
+        toast.error('Datei konnte nicht gelesen werden');
+      }
+    };
+    reader.readAsText(file);
+    // reset so same file can be re-imported
+    e.target.value = '';
+  }, []);
+
+  // ── PDF Export ──
   const exportPdf = useCallback(async () => {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
@@ -53,17 +96,14 @@ const Index = () => {
       doc.text('Konzept KI-Telefonassistent', margin, 18);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(data.praxisName || 'Zahnarztpraxis', margin, 28);
+      doc.text(data.einrichtungsName || 'Einrichtung', margin, 28);
       doc.setFontSize(8);
       doc.text(`Erstellt am: ${new Date().toLocaleDateString('de-DE')}`, margin, 35);
       y = 50;
     };
 
     const checkPage = (needed: number) => {
-      if (y + needed > 280) {
-        doc.addPage();
-        y = 20;
-      }
+      if (y + needed > 280) { doc.addPage(); y = 20; }
     };
 
     const addSection = (title: string) => {
@@ -93,7 +133,8 @@ const Index = () => {
     addHeader();
 
     addSection('Allgemeine Informationen');
-    addRow('Praxis', data.praxisName);
+    addRow('Typ', data.einrichtungstyp);
+    addRow('Name', data.einrichtungsName);
     addRow('Fachbereich', data.fachbereich);
     addRow('Telefon', data.telefonnummer);
     addRow('Sprachen', data.sprachen.join(', '));
@@ -133,7 +174,6 @@ const Index = () => {
     addRow('Leistungen', data.leistungen);
     addRow('Besonderheiten', data.besonderheiten);
 
-    // Footer on all pages
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -145,7 +185,7 @@ const Index = () => {
       doc.text(`Seite ${i} / ${pageCount}`, pageWidth - margin - 20, 293);
     }
 
-    const filename = `Konzept_KI_Telefonassistent_${(data.praxisName || 'Praxis').replace(/\s+/g, '_')}.pdf`;
+    const filename = `Konzept_KI_Telefonassistent_${(data.einrichtungsName || 'Einrichtung').replace(/\s+/g, '_')}.pdf`;
     doc.save(filename);
     toast.success('PDF wurde erfolgreich erstellt!');
   }, [data]);
@@ -166,13 +206,42 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="gradient-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-            <Phone className="w-5 h-5 text-accent" />
+        <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+              <Phone className="w-5 h-5 text-accent" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">medflex KI-Telefonassistent</h1>
+              <p className="text-sm text-primary-foreground/70">Onboarding & Konfiguration</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold">medflex KI-Telefonassistent</h1>
-            <p className="text-sm text-primary-foreground/70">Onboarding & Konfiguration</p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 gap-1.5"
+            >
+              <Upload className="w-4 h-4" />
+              <span className="hidden sm:inline">Laden</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={exportMlfx}
+              className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 gap-1.5"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Speichern</span>
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".mlfx"
+              onChange={importMlfx}
+              className="hidden"
+            />
           </div>
         </div>
       </header>

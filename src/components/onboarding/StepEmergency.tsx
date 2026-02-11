@@ -25,7 +25,7 @@ const StepEmergency = ({ data, onChange }: Props) => {
             onCheckedChange={(checked) => onChange({ notfaelleIntern: checked })}
           />
           <span className="text-sm text-muted-foreground">
-            {data.notfaelleIntern ? 'Ja – Weiterleitung in die Praxis' : 'Nein'}
+            {data.notfaelleIntern ? 'Ja – Weiterleitung in die Einrichtung' : 'Nein'}
           </span>
         </div>
       </FormField>
@@ -42,7 +42,7 @@ const StepEmergency = ({ data, onChange }: Props) => {
       </FormField>
 
       {data.notfaelleIntern && (
-        <FormField label="Notfallnummer" hint="Darf nicht die reguläre Praxisnummer sein!">
+        <FormField label="Notfallnummer" hint="Darf nicht die reguläre Hauptnummer sein!">
           <Input
             value={data.notfallTelefon}
             onChange={(e) => onChange({ notfallTelefon: e.target.value })}

@@ -25,7 +25,7 @@ const StepRequests = ({ data, onChange }: Props) => {
             <TagInput
               tags={data.terminarten}
               onChange={(terminarten) => onChange({ terminarten })}
-              placeholder="z.B. Routineuntersuchung, PZR, Behandlung"
+              placeholder="z.B. Routineuntersuchung, Erstgespräch, Behandlung"
             />
           </FormField>
           <div className="mt-3">
@@ -42,7 +42,7 @@ const StepRequests = ({ data, onChange }: Props) => {
               <Textarea
                 value={data.terminRegeln}
                 onChange={(e) => onChange({ terminRegeln: e.target.value })}
-                placeholder="z.B. Neupatienten nur vormittags, PZR nur bei Frau Schmidt"
+                placeholder="z.B. Neupatienten nur vormittags, bestimmte Behandlungen nur bei Arzt X"
                 rows={3}
               />
             </FormField>
