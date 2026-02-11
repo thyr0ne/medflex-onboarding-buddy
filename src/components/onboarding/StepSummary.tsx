@@ -51,7 +51,8 @@ const StepSummary = ({ data, onExportPdf }: Props) => {
     >
       <div className="space-y-5" id="pdf-content">
         <Section title="Allgemeine Informationen">
-          <Row label="Praxis" value={data.praxisName || '–'} />
+          <Row label="Typ" value={data.einrichtungstyp} />
+          <Row label="Name" value={data.einrichtungsName || '–'} />
           <Row label="Fachbereich" value={data.fachbereich || '–'} />
           <Row label="Telefon" value={data.telefonnummer || '–'} />
           <Row label="Sprachen" value={<Tags items={data.sprachen} />} />

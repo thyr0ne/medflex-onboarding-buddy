@@ -97,7 +97,7 @@ const StepCallers = ({ data, onChange }: Props) => {
         </FormField>
 
         {data.zuweiserDurchstellen && (
-          <FormField label="Telefonnummer zum Durchstellen" hint="Darf nicht die reguläre Praxisnummer sein!">
+          <FormField label="Telefonnummer zum Durchstellen" hint="Darf nicht die reguläre Hauptnummer sein!">
             <Input
               value={data.zuweiserTelefon}
               onChange={(e) => onChange({ zuweiserTelefon: e.target.value })}
