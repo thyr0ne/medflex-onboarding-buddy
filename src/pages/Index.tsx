@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Phone, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import medflexLogo from '@/assets/medflex-logo.png';
 
 const STEPS = [
   { id: 1, title: 'Allgemein' },
@@ -234,11 +235,10 @@ const Index = () => {
       <header className="gradient-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
-              <Phone className="w-5 h-5 text-accent" />
-            </div>
+            <img src={medflexLogo} alt="medflex Logo" className="h-8 object-contain" />
+            <div className="h-6 w-px bg-primary-foreground/30" />
             <div>
-              <h1 className="text-xl font-bold">medflex KI-Telefonassistent</h1>
+              <h1 className="text-xl font-bold">KI-Telefonassistent</h1>
               <p className="text-sm text-primary-foreground/70">Onboarding & Konfiguration</p>
             </div>
           </div>
