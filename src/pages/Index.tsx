@@ -4,7 +4,8 @@ import StepIndicator from '@/components/onboarding/StepIndicator';
 import StepGeneral from '@/components/onboarding/StepGeneral';
 import StepCallers from '@/components/onboarding/StepCallers';
 import StepEmergency from '@/components/onboarding/StepEmergency';
-import StepRequests from '@/components/onboarding/StepRequests';
+import StepAppointments from '@/components/onboarding/StepAppointments';
+import StepDocuments from '@/components/onboarding/StepDocuments';
 import StepKnowledge from '@/components/onboarding/StepKnowledge';
 import StepSummary from '@/components/onboarding/StepSummary';
 import { Button } from '@/components/ui/button';
@@ -16,9 +17,10 @@ const STEPS = [
   { id: 1, title: 'Allgemein' },
   { id: 2, title: 'Anrufer' },
   { id: 3, title: 'Notfälle' },
-  { id: 4, title: 'Anfragen' },
-  { id: 5, title: 'Wissen' },
-  { id: 6, title: 'Übersicht' },
+  { id: 4, title: 'Termine' },
+  { id: 5, title: 'Dokumente' },
+  { id: 6, title: 'Wissen' },
+  { id: 7, title: 'Übersicht' },
 ];
 
 const Index = () => {
@@ -218,9 +220,10 @@ const Index = () => {
       case 1: return <StepGeneral data={data} onChange={handleChange} />;
       case 2: return <StepCallers data={data} onChange={handleChange} />;
       case 3: return <StepEmergency data={data} onChange={handleChange} />;
-      case 4: return <StepRequests data={data} onChange={handleChange} />;
-      case 5: return <StepKnowledge data={data} onChange={handleChange} />;
-      case 6: return <StepSummary data={data} onExportPdf={exportPdf} />;
+      case 4: return <StepAppointments data={data} onChange={handleChange} />;
+      case 5: return <StepDocuments data={data} onChange={handleChange} />;
+      case 6: return <StepKnowledge data={data} onChange={handleChange} />;
+      case 7: return <StepSummary data={data} onExportPdf={exportPdf} />;
       default: return null;
     }
   };
