@@ -1,4 +1,4 @@
-import { OnboardingData } from '@/types/onboarding';
+import { OnboardingData, VERFUEGBARE_VERSICHERUNGEN } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
 import { Switch } from '@/components/ui/switch';
@@ -16,11 +16,21 @@ const StepCallers = ({ data, onChange }: Props) => {
   return (
     <StepCard
       title="Anrufer-Typen & Datenschutz"
-      description="Definieren Sie, wer anruft und welche Daten erfasst werden sollen."
+      description="Begrüßung, Datenschutz und Konfiguration der verschiedenen Anrufer-Typen."
       image={stepImage}
     >
+      {/* Begrüßung (von Seite 1 hierher verschoben) */}
+      <FormField label="Beispiel-Begrüßung" hint="Passen Sie die Begrüßung an Ihre Einrichtung an.">
+        <Textarea
+          value={data.begruessung}
+          onChange={(e) => onChange({ begruessung: e.target.value })}
+          placeholder='z.B. "Herzlich willkommen bei [Name]. Ich bin Lisa, die KI-Telefonassistentin. Wie kann ich Ihnen helfen?"'
+          rows={4}
+        />
+      </FormField>
+
       <div className="grid gap-4">
-        <FormField label="Datenschutzhinweis auf der Website">
+        <FormField label="Datenschutzhinweis auf Ihrer Website">
           <div className="flex items-center gap-3">
             <Switch
               checked={data.datenschutzWebsite}
@@ -32,7 +42,7 @@ const StepCallers = ({ data, onChange }: Props) => {
           </div>
         </FormField>
 
-        <FormField label="Datenschutzhinweis in der Ansage">
+        <FormField label="Datenschutzhinweis in der Begrüßung / Ansage">
           <div className="flex items-center gap-3">
             <Switch
               checked={data.datenschutzAnsage}
@@ -44,21 +54,71 @@ const StepCallers = ({ data, onChange }: Props) => {
           </div>
         </FormField>
 
-        <FormField label="Hinweis auf 112 bei lebensbedrohlichen Fällen">
+        <FormField label="Hinweis auf 112 bei lebensbedrohlichen Notfällen">
           <div className="flex items-center gap-3">
             <Switch
               checked={data.hinweis112}
               onCheckedChange={(checked) => onChange({ hinweis112: checked })}
             />
             <span className="text-sm text-muted-foreground">
-              {data.hinweis112 ? 'Ja' : 'Nein'}
+              {data.hinweis112 ? 'Ja – „Bitte rufen Sie bei lebensbedrohlichen Notfällen die 112 an."' : 'Nein'}
             </span>
           </div>
         </FormField>
       </div>
 
+      {/* Patientenaufnahme */}
       <div className="border-t border-border pt-5 mt-5">
         <h3 className="text-lg font-semibold text-foreground mb-4">Patientenaufnahme</h3>
+
+        <FormField label="Versicherungsarten" hint="Welche Versicherungsarten akzeptieren Sie?">
+          <div className="flex flex-wrap gap-2">
+            {VERFUEGBARE_VERSICHERUNGEN.map((v) => {
+              const isSelected = data.versicherungsarten.includes(v);
+              return (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => {
+                    if (isSelected) {
+                      onChange({ versicherungsarten: data.versicherungsarten.filter(s => s !== v) });
+                    } else {
+                      onChange({ versicherungsarten: [...data.versicherungsarten, v] });
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    isSelected
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  {v}
+                </button>
+              );
+            })}
+          </div>
+        </FormField>
+
+        <FormField label="Zu erfassende Patientendaten" hint="Welche Daten soll der Assistent vom Anrufer abfragen?">
+          <TagInput
+            tags={data.patientendatenFelder}
+            onChange={(patientendatenFelder) => onChange({ patientendatenFelder })}
+            placeholder="z.B. Krankenversicherung, Geburtsdatum"
+          />
+        </FormField>
+
+        <FormField label="Prioritäts-Tags" hint="Falls bestimmte Anliegen oder Anrufer priorisiert werden sollen">
+          <TagInput
+            tags={data.prioTags}
+            onChange={(prioTags) => onChange({ prioTags })}
+            placeholder="z.B. Dringend, VIP, Rückruf heute"
+          />
+        </FormField>
+      </div>
+
+      {/* Neupatienten → zur Terminanfrage verknüpft */}
+      <div className="border-t border-border pt-5 mt-5">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Neupatienten</h3>
 
         <FormField label="Neupatienten aufnehmen?">
           <div className="flex items-center gap-3">
@@ -82,36 +142,36 @@ const StepCallers = ({ data, onChange }: Props) => {
             />
           </FormField>
         )}
+      </div>
 
-        <FormField label="Versicherungsarten">
-          <TagInput
-            tags={data.versicherungsarten}
-            onChange={(versicherungsarten) => onChange({ versicherungsarten })}
-            placeholder="z.B. Bundeswehr"
-          />
-        </FormField>
+      {/* Vertreter als eigener Usertyp */}
+      <div className="border-t border-border pt-5 mt-5">
+        <h3 className="text-lg font-semibold text-foreground mb-4">Vertreter</h3>
 
-        <FormField label="Zu erfassende Patientendaten" hint="Welche Daten soll der Assistent vom Anrufer abfragen?">
-          <TagInput
-            tags={data.patientendatenFelder}
-            onChange={(patientendatenFelder) => onChange({ patientendatenFelder })}
-            placeholder="z.B. E-Mail-Adresse"
-          />
-        </FormField>
-
-        <FormField label="Vertreterdaten zusätzlich erfassen?">
+        <FormField label="Vertreter als Anrufer-Typ?" hint="z.B. Eltern, Angehörige, Bevollmächtigte">
           <div className="flex items-center gap-3">
             <Switch
-              checked={data.vertreterdatenErfassen}
-              onCheckedChange={(checked) => onChange({ vertreterdatenErfassen: checked })}
+              checked={data.vertreterHandling}
+              onCheckedChange={(checked) => onChange({ vertreterHandling: checked })}
             />
             <span className="text-sm text-muted-foreground">
-              {data.vertreterdatenErfassen ? 'Ja – Name Vertreter + Beziehung zum Patienten' : 'Nein'}
+              {data.vertreterHandling ? 'Ja' : 'Nein'}
             </span>
           </div>
         </FormField>
+
+        {data.vertreterHandling && (
+          <FormField label="Datenerfassung bei Vertretern">
+            <TagInput
+              tags={data.vertreterDatenerfassung}
+              onChange={(vertreterDatenerfassung) => onChange({ vertreterDatenerfassung })}
+              placeholder="z.B. Name des Vertreters, Beziehung zum Patienten"
+            />
+          </FormField>
+        )}
       </div>
 
+      {/* Zuweiser */}
       <div className="border-t border-border pt-5 mt-5">
         <h3 className="text-lg font-semibold text-foreground mb-4">Zuweiser & ärztliche Kollegen</h3>
 
@@ -136,8 +196,19 @@ const StepCallers = ({ data, onChange }: Props) => {
             />
           </FormField>
         )}
+
+        {!data.zuweiserDurchstellen && (
+          <FormField label="Zu erfassende Daten bei Zuweisern">
+            <TagInput
+              tags={data.zuweiserDatenerfassung}
+              onChange={(zuweiserDatenerfassung) => onChange({ zuweiserDatenerfassung })}
+              placeholder="z.B. Name, Praxis, Rückrufnummer, Anliegen"
+            />
+          </FormField>
+        )}
       </div>
 
+      {/* Rückrufer */}
       <div className="border-t border-border pt-5 mt-5">
         <h3 className="text-lg font-semibold text-foreground mb-4">Rückrufer</h3>
 
@@ -148,22 +219,47 @@ const StepCallers = ({ data, onChange }: Props) => {
               onCheckedChange={(checked) => onChange({ rueckruferHandling: checked })}
             />
             <span className="text-sm text-muted-foreground">
-              {data.rueckruferHandling ? 'Ja – Weiterleitung' : 'Nein'}
+              {data.rueckruferHandling ? 'Ja' : 'Nein'}
             </span>
           </div>
         </FormField>
 
         {data.rueckruferHandling && (
-          <FormField label="Weiterleitungsnummer für Rückrufer">
-            <Input
-              value={data.rueckruferTelefon}
-              onChange={(e) => onChange({ rueckruferTelefon: e.target.value })}
-              placeholder="z.B. 0049 2064 60 92 – 25"
-            />
-          </FormField>
+          <>
+            <FormField label="Rückrufer direkt durchstellen?">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={data.rueckruferDurchstellen}
+                  onCheckedChange={(checked) => onChange({ rueckruferDurchstellen: checked })}
+                />
+                <span className="text-sm text-muted-foreground">
+                  {data.rueckruferDurchstellen ? 'Ja – Weiterleitung' : 'Nein – Daten erfassen'}
+                </span>
+              </div>
+            </FormField>
+
+            {data.rueckruferDurchstellen ? (
+              <FormField label="Weiterleitungsnummer für Rückrufer">
+                <Input
+                  value={data.rueckruferTelefon}
+                  onChange={(e) => onChange({ rueckruferTelefon: e.target.value })}
+                  placeholder="z.B. 0049 2064 60 92 – 25"
+                />
+              </FormField>
+            ) : (
+              <FormField label="Zu erfassende Daten bei Rückrufern">
+                <TagInput
+                  tags={data.rueckruferDatenerfassung}
+                  onChange={(rueckruferDatenerfassung) => onChange({ rueckruferDatenerfassung })}
+                  placeholder="z.B. Name, Rückrufnummer, Anliegen"
+                />
+              </FormField>
+            )}
+          </>
         )}
       </div>
 
+      {/* BG-Fall */}
       <div className="border-t border-border pt-5 mt-5">
         <h3 className="text-lg font-semibold text-foreground mb-4">BG-Fall / Arbeitsunfälle</h3>
 

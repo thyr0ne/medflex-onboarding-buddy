@@ -9,7 +9,7 @@ import StepDocuments from '@/components/onboarding/StepDocuments';
 import StepKnowledge from '@/components/onboarding/StepKnowledge';
 import StepSummary from '@/components/onboarding/StepSummary';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Phone, Download, Upload } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import medflexLogo from '@/assets/medflex-logo.png';
@@ -78,7 +78,6 @@ const Index = () => {
       }
     };
     reader.readAsText(file);
-    // reset so same file can be re-imported
     e.target.value = '';
   }, []);
 
@@ -136,10 +135,12 @@ const Index = () => {
     addHeader();
 
     addSection('Allgemeine Informationen');
-    addRow('Typ', data.einrichtungstyp);
+    addRow('Typ', data.einrichtungstyp === 'Andere' ? data.einrichtungstypAndere || 'Andere' : data.einrichtungstyp);
     addRow('Name', data.einrichtungsName);
     addRow('Fachbereich', data.fachbereich);
-    addRow('Telefon', data.telefonnummer);
+    addRow('Leistungsspektrum', data.leistungsspektrum);
+    addRow('Hauptrufnummer', data.hauptrufnummer);
+    addRow('Durchwahl medflex', data.durchwahlMedflex);
     addRow('Sprachen', data.sprachen.join(', '));
     addRow('Stimme', data.stimme);
 
@@ -150,15 +151,17 @@ const Index = () => {
     if (data.begruessung) addRow('Begrüßung', data.begruessung);
 
     addSection('Anrufer-Typen');
+    addRow('Versicherungsarten', data.versicherungsarten.join(', '));
+    addRow('Patientendaten', data.patientendatenFelder.join(', '));
+    if (data.prioTags.length > 0) addRow('Prioritäts-Tags', data.prioTags.join(', '));
     addRow('Neupatienten', data.neupatientenAufnahme ? 'Ja' : 'Nein');
     if (data.neupatientenRegeln) addRow('Neupatientenregeln', data.neupatientenRegeln);
-    addRow('Versicherungen', data.versicherungsarten.join(', '));
-    addRow('Patientendaten', data.patientendatenFelder.join(', '));
-    addRow('Vertreterdaten', data.vertreterdatenErfassen ? 'Ja' : 'Nein');
+    addRow('Vertreter', data.vertreterHandling ? 'Ja' : 'Nein');
+    if (data.vertreterHandling) addRow('Vertreterdaten', data.vertreterDatenerfassung.join(', '));
     addRow('Zuweiser durchstellen', data.zuweiserDurchstellen ? 'Ja' : 'Nein');
-    if (data.zuweiserTelefon) addRow('Zuweiser-Telefon', data.zuweiserTelefon);
+    if (data.zuweiserDurchstellen && data.zuweiserTelefon) addRow('Zuweiser-Telefon', data.zuweiserTelefon);
     addRow('Rückrufer-Handling', data.rueckruferHandling ? 'Ja' : 'Nein');
-    if (data.rueckruferTelefon) addRow('Rückrufer-Telefon', data.rueckruferTelefon);
+    if (data.rueckruferHandling && data.rueckruferDurchstellen && data.rueckruferTelefon) addRow('Rückrufer-Telefon', data.rueckruferTelefon);
     addRow('BG-Fall Behandlung', data.bgFallHandling ? 'Ja' : 'Nein');
     if (data.bgFallHinweis) addRow('BG-Fall Hinweis', data.bgFallHinweis);
 
@@ -169,24 +172,44 @@ const Index = () => {
     addRow('Akutsprechstunde', data.akutsprechstunde ? 'Ja' : 'Nein');
     if (data.notfallDatenerfassung.length > 0) addRow('Notfall-Datenerfassung', data.notfallDatenerfassung.join(', '));
 
-    addSection('Anfragetypen');
-    addRow('Terminarten', data.terminarten.join(', '));
-    addRow('Termin-Datenerfassung', data.terminDatenerfassung.join(', '));
-    if (data.terminRegeln) addRow('Terminregeln', data.terminRegeln);
+    addSection('Terminmanagement');
     if (data.onlineBuchungHinweis) addRow('Online-Buchung', data.onlineBuchungHinweis);
+    addRow('Terminanfrage', data.terminAnfrage ? 'Ja' : 'Nein');
+    if (!data.terminAnfrage && data.terminAnfrageAlternative) addRow('Alternative', data.terminAnfrageAlternative);
+    if (data.terminAnfrage) {
+      addRow('Terminarten', data.terminarten.join(', '));
+      addRow('Verfügbar für', data.terminVerfuegbarFuer.join(', '));
+      addRow('Datenerfassung', data.terminDatenerfassung.join(', '));
+      if (data.terminRegeln) addRow('Terminregeln', data.terminRegeln);
+      if (data.terminGespraechsabschluss) addRow('Gesprächsabschluss', data.terminGespraechsabschluss);
+      if (data.terminTags.length > 0) addRow('Tags', data.terminTags.join(', '));
+    }
     addRow('Terminabsage/-änderung', data.terminAbsage ? 'Ja' : 'Nein');
     if (data.terminAbsage && data.terminAbsageRegeln) addRow('Absage-Regeln', data.terminAbsageRegeln);
-    addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
-    if (data.rezeptRegeln) addRow('Rezeptregeln', data.rezeptRegeln);
-    if (data.rezeptDatenerfassung.length > 0) addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
-    if (data.rezeptAbholung) addRow('Rezeptabholung', data.rezeptAbholung);
-    addRow('Befund für', data.befundVerfuegbar.join(', '));
-    if (data.befundRegeln) addRow('Befundregeln', data.befundRegeln);
-    if (data.befundDatenerfassung.length > 0) addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
+
+    addSection('Dokumente & Weiteres');
+    addRow('Rezeptanfragen', data.rezeptAnfrage ? 'Ja' : 'Nein');
+    if (data.rezeptAnfrage) {
+      addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
+      if (data.rezeptRegeln) addRow('Rezeptregeln', data.rezeptRegeln);
+      addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
+      if (data.rezeptZustellung) addRow('Zustellung', data.rezeptZustellung);
+    }
+    addRow('Befundanfragen', data.befundAnfrage ? 'Ja' : 'Nein');
+    if (data.befundAnfrage) {
+      addRow('Befund für', data.befundVerfuegbar.join(', '));
+      addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
+    }
     addRow('Überweisung', data.ueberweisung ? 'Ja' : 'Nein');
-    if (data.ueberweisung && data.ueberweisungRegeln) addRow('Überweisungsregeln', data.ueberweisungRegeln);
+    if (data.ueberweisung) {
+      if (data.ueberweisungVerfuegbar.length > 0) addRow('Verfügbar für', data.ueberweisungVerfuegbar.join(', '));
+      if (data.ueberweisungZustellung) addRow('Zustellung', data.ueberweisungZustellung);
+    }
     addRow('AU / Krankschreibung', data.auKrankschreibung ? 'Ja' : 'Nein');
     if (data.auKrankschreibung && data.auRegeln) addRow('AU-Regeln', data.auRegeln);
+    if (data.weitereAnliegen.length > 0) {
+      addRow('Weitere Anliegen', data.weitereAnliegen.map(a => a.name).filter(Boolean).join(', '));
+    }
     addRow('Sonstiges', data.sonstigesAnliegen ? 'Ja' : 'Nein');
     addRow('Weiterleitung Gespräch', data.weiterleitungBeiGespraech ? 'Ja' : 'Nein');
     if (data.weiterleitungBeiGespraech && data.weiterleitungTelefon) addRow('Weiterleitungs-Nr.', data.weiterleitungTelefon);
@@ -231,7 +254,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="gradient-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -272,13 +294,11 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         <StepIndicator steps={STEPS} currentStep={currentStep} />
 
         <div className="mt-6">{renderStep()}</div>
 
-        {/* Navigation */}
         <div className="flex justify-between mt-8 pb-12">
           <Button
             variant="outline"
