@@ -1,10 +1,8 @@
-import { OnboardingData, Einrichtungstyp } from '@/types/onboarding';
+import { OnboardingData, Einrichtungstyp, VERFUEGBARE_SPRACHEN } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
-import TagInput from './TagInput';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import stepImage from '@/assets/step-welcome.jpg';
 
 interface Props {
@@ -12,13 +10,13 @@ interface Props {
   onChange: (data: Partial<OnboardingData>) => void;
 }
 
-const einrichtungstypen: Einrichtungstyp[] = ['Praxis', 'MVZ', 'Klinikum', 'Sonstige'];
+const einrichtungstypen: Einrichtungstyp[] = ['Praxis', 'MVZ', 'Klinikum', 'Andere'];
 
 const placeholderByType: Record<Einrichtungstyp, string> = {
   Praxis: 'z.B. Hausarztpraxis Dr. Müller',
   MVZ: 'z.B. MVZ Zentrum für Gesundheit',
   Klinikum: 'z.B. Städtisches Klinikum Musterstadt',
-  Sonstige: 'z.B. Therapiezentrum Musterstadt',
+  Andere: 'z.B. Therapiezentrum Musterstadt',
 };
 
 const StepGeneral = ({ data, onChange }: Props) => {
@@ -44,6 +42,16 @@ const StepGeneral = ({ data, onChange }: Props) => {
         </Select>
       </FormField>
 
+      {data.einrichtungstyp === 'Andere' && (
+        <FormField label="Bitte spezifizieren">
+          <Input
+            value={data.einrichtungstypAndere}
+            onChange={(e) => onChange({ einrichtungstypAndere: e.target.value })}
+            placeholder="z.B. Physiotherapie, Tagesklinik, Pflegeeinrichtung"
+          />
+        </FormField>
+      )}
+
       <FormField label="Name der Einrichtung">
         <Input
           value={data.einrichtungsName}
@@ -52,28 +60,64 @@ const StepGeneral = ({ data, onChange }: Props) => {
         />
       </FormField>
 
-      <FormField label="Fachbereich / Leistungsspektrum">
+      <FormField label="Fachbereich">
         <Input
           value={data.fachbereich}
           onChange={(e) => onChange({ fachbereich: e.target.value })}
-          placeholder="z.B. Allgemeinmedizin, Orthopädie, Zahnmedizin"
+          placeholder="z.B. Allgemeinmedizin, Orthopädie, Kardiologie"
         />
       </FormField>
 
-      <FormField label="Telefonnummer">
+      <FormField label="Leistungsspektrum">
         <Input
-          value={data.telefonnummer}
-          onChange={(e) => onChange({ telefonnummer: e.target.value })}
+          value={data.leistungsspektrum}
+          onChange={(e) => onChange({ leistungsspektrum: e.target.value })}
+          placeholder="z.B. Vorsorge, Labordiagnostik, Schmerztherapie"
+        />
+      </FormField>
+
+      <FormField label="Hauptrufnummer" hint="Die reguläre Praxisnummer für Patienten">
+        <Input
+          value={data.hauptrufnummer}
+          onChange={(e) => onChange({ hauptrufnummer: e.target.value })}
           placeholder="z.B. 089 12345678"
         />
       </FormField>
 
-      <FormField label="Sprachen">
-        <TagInput
-          tags={data.sprachen}
-          onChange={(sprachen) => onChange({ sprachen })}
-          placeholder="Sprache hinzufügen..."
+      <FormField label="Durchwahl für medflex" hint="Separate Nummer, damit die Praxis weiterhin erreichbar bleibt, wenn der Assistent aktiv ist">
+        <Input
+          value={data.durchwahlMedflex}
+          onChange={(e) => onChange({ durchwahlMedflex: e.target.value })}
+          placeholder="z.B. 089 12345679"
         />
+      </FormField>
+
+      <FormField label="Sprachen" hint="Wählen Sie die Sprachen, die der Assistent unterstützen soll">
+        <div className="flex flex-wrap gap-2">
+          {VERFUEGBARE_SPRACHEN.map((sprache) => {
+            const isSelected = data.sprachen.includes(sprache);
+            return (
+              <button
+                key={sprache}
+                type="button"
+                onClick={() => {
+                  if (isSelected) {
+                    onChange({ sprachen: data.sprachen.filter(s => s !== sprache) });
+                  } else {
+                    onChange({ sprachen: [...data.sprachen, sprache] });
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                  isSelected
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-background text-muted-foreground border-border hover:border-primary/50'
+                }`}
+              >
+                {sprache}
+              </button>
+            );
+          })}
+        </div>
       </FormField>
 
       <FormField label="Stimme des Assistenten">
@@ -86,15 +130,6 @@ const StepGeneral = ({ data, onChange }: Props) => {
             <SelectItem value="männlich">Männlich</SelectItem>
           </SelectContent>
         </Select>
-      </FormField>
-
-      <FormField label="Beispiel-Begrüßung" hint="Passen Sie die Begrüßung an Ihre Einrichtung an.">
-        <Textarea
-          value={data.begruessung}
-          onChange={(e) => onChange({ begruessung: e.target.value })}
-          placeholder='z.B. "Herzlich willkommen bei [Name]. Ich bin Lisa, die KI-Telefonassistentin. Wie kann ich Ihnen helfen?"'
-          rows={4}
-        />
       </FormField>
     </StepCard>
   );
