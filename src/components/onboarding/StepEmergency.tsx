@@ -1,6 +1,7 @@
 import { OnboardingData } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
+import SectionHeading from './SectionHeading';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import TagInput from './TagInput';
@@ -12,12 +13,24 @@ interface Props {
 }
 
 const StepEmergency = ({ data, onChange }: Props) => {
+  const setComment = (key: string, value: string) => {
+    onChange({ comments: { ...data.comments, [key]: value } });
+  };
+
   return (
     <StepCard
       title="Notfallbearbeitung"
       description="Definieren Sie, wie Notfälle erkannt und bearbeitet werden."
       image={stepImage}
     >
+      <SectionHeading
+        title="Notfallbearbeitung"
+        commentKey="notfallbearbeitung"
+        comment={data.comments?.notfallbearbeitung || ''}
+        onCommentChange={setComment}
+        className="mb-4 -mt-1"
+      />
+
       <FormField label="Werden Notfälle intern bearbeitet?">
         <div className="flex items-center gap-3">
           <Switch

@@ -1,8 +1,9 @@
 import { OnboardingData, VERFUEGBARE_VERSICHERUNGEN } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
+import SectionHeading from './SectionHeading';
+import RichTextEditor from './RichTextEditor';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import stepImage from '@/assets/step-callers.jpg';
 import TagInput from './TagInput';
 import { Input } from '@/components/ui/input';
@@ -13,19 +14,22 @@ interface Props {
 }
 
 const StepCallers = ({ data, onChange }: Props) => {
+  const setComment = (key: string, value: string) => {
+    onChange({ comments: { ...data.comments, [key]: value } });
+  };
+
   return (
     <StepCard
       title="Anrufer-Typen & Datenschutz"
       description="Begrüßung, Datenschutz und Konfiguration der verschiedenen Anrufer-Typen."
       image={stepImage}
     >
-      {/* Begrüßung (von Seite 1 hierher verschoben) */}
+      {/* Begrüßung */}
       <FormField label="Beispiel-Begrüßung" hint="Passen Sie die Begrüßung an Ihre Einrichtung an.">
-        <Textarea
+        <RichTextEditor
           value={data.begruessung}
-          onChange={(e) => onChange({ begruessung: e.target.value })}
+          onChange={(v) => onChange({ begruessung: v })}
           placeholder='z.B. "Herzlich willkommen bei [Name]. Ich bin Lisa, die KI-Telefonassistentin. Wie kann ich Ihnen helfen?"'
-          rows={4}
         />
       </FormField>
 
@@ -69,7 +73,13 @@ const StepCallers = ({ data, onChange }: Props) => {
 
       {/* Patientenaufnahme */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Patientenaufnahme</h3>
+        <SectionHeading
+          title="Patientenaufnahme"
+          commentKey="patientenaufnahme"
+          comment={data.comments?.patientenaufnahme || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Versicherungsarten" hint="Welche Versicherungsarten akzeptieren Sie?">
           <div className="flex flex-wrap gap-2">
@@ -116,9 +126,15 @@ const StepCallers = ({ data, onChange }: Props) => {
         </FormField>
       </div>
 
-      {/* Neupatienten → zur Terminanfrage verknüpft */}
+      {/* Neupatienten */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Neupatienten</h3>
+        <SectionHeading
+          title="Neupatienten"
+          commentKey="neupatienten"
+          comment={data.comments?.neupatienten || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Neupatienten aufnehmen?">
           <div className="flex items-center gap-3">
@@ -134,19 +150,24 @@ const StepCallers = ({ data, onChange }: Props) => {
 
         {data.neupatientenAufnahme && (
           <FormField label="Regeln für Neupatientenaufnahme" hint="z.B. Altersgrenzen, Überweisungspflicht, Versicherungsbeschränkungen">
-            <Textarea
+            <RichTextEditor
               value={data.neupatientenRegeln}
-              onChange={(e) => onChange({ neupatientenRegeln: e.target.value })}
+              onChange={(v) => onChange({ neupatientenRegeln: v })}
               placeholder="z.B. Ab 16 Jahren; GKV nur mit Überweisung; Privat und Selbstzahler ohne Einschränkung"
-              rows={3}
             />
           </FormField>
         )}
       </div>
 
-      {/* Vertreter als eigener Usertyp */}
+      {/* Vertreter */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Vertreter</h3>
+        <SectionHeading
+          title="Vertreter"
+          commentKey="vertreter"
+          comment={data.comments?.vertreter || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Vertreter als Anrufer-Typ?" hint="z.B. Eltern, Angehörige, Bevollmächtigte">
           <div className="flex items-center gap-3">
@@ -173,7 +194,13 @@ const StepCallers = ({ data, onChange }: Props) => {
 
       {/* Zuweiser */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Zuweiser & ärztliche Kollegen</h3>
+        <SectionHeading
+          title="Zuweiser & ärztliche Kollegen"
+          commentKey="zuweiser"
+          comment={data.comments?.zuweiser || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Zuweiser direkt durchstellen?">
           <div className="flex items-center gap-3">
@@ -210,7 +237,13 @@ const StepCallers = ({ data, onChange }: Props) => {
 
       {/* Rückrufer */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Rückrufer</h3>
+        <SectionHeading
+          title="Rückrufer"
+          commentKey="rueckrufer"
+          comment={data.comments?.rueckrufer || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Rückrufer-Behandlung aktiv?" hint="Anrufer, die zurückrufen weil sie angerufen wurden">
           <div className="flex items-center gap-3">
@@ -261,7 +294,13 @@ const StepCallers = ({ data, onChange }: Props) => {
 
       {/* BG-Fall */}
       <div className="border-t border-border pt-5 mt-5">
-        <h3 className="text-lg font-semibold text-foreground mb-4">BG-Fall / Arbeitsunfälle</h3>
+        <SectionHeading
+          title="BG-Fall / Arbeitsunfälle"
+          commentKey="bgFall"
+          comment={data.comments?.bgFall || ''}
+          onCommentChange={setComment}
+          className="mb-4"
+        />
 
         <FormField label="Spezielle BG-Fall Behandlung?" hint="Arbeits-, Wege-, Schul- und Kindergartenunfälle">
           <div className="flex items-center gap-3">
@@ -277,11 +316,10 @@ const StepCallers = ({ data, onChange }: Props) => {
 
         {data.bgFallHandling && (
           <FormField label="Hinweistext / Verweis bei BG-Fällen" hint="z.B. Verweis auf D-Arzt, Partnerpraxen">
-            <Textarea
+            <RichTextEditor
               value={data.bgFallHinweis}
-              onChange={(e) => onChange({ bgFallHinweis: e.target.value })}
+              onChange={(v) => onChange({ bgFallHinweis: v })}
               placeholder="z.B. In der Praxis können leider keine Arbeits-, Wege-, Schul- und Kindergartenunfälle behandelt werden. Bitte wenden Sie sich an eine Praxis mit D-Arzt-Zulassung."
-              rows={4}
             />
           </FormField>
         )}
