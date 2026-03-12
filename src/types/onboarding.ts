@@ -252,6 +252,8 @@ export const defaultOnboardingData: OnboardingData = {
   behandlerListe: '',
   leistungen: '',
   besonderheiten: '',
+
+  comments: {},
 };
 
 export const MLFX_VERSION = '1.2';
