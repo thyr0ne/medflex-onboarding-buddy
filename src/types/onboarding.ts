@@ -128,6 +128,9 @@ export interface OnboardingData {
   behandlerListe: string;
   leistungen: string;
   besonderheiten: string;
+
+  // Kommentare (intern)
+  comments: Record<string, string>;
 }
 
 export interface WeitereAnliegenItem {
