@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { OnboardingData, WeitereAnliegenItem } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
+import SectionHeading from './SectionHeading';
+import RichTextEditor from './RichTextEditor';
 import TagInput from './TagInput';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -65,6 +66,10 @@ const ServiceToggle = ({
 const StepDocuments = ({ data, onChange }: Props) => {
   const [expandedAnliegen, setExpandedAnliegen] = useState<number | null>(null);
 
+  const setComment = (key: string, value: string) => {
+    onChange({ comments: { ...data.comments, [key]: value } });
+  };
+
   const addAnliegen = () => {
     onChange({ weitereAnliegen: [...data.weitereAnliegen, { ...emptyAnliegen }] });
     setExpandedAnliegen(data.weitereAnliegen.length);
@@ -89,7 +94,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
       <div className="space-y-6">
         {/* Rezept */}
         <div>
-          <h3 className="text-lg font-semibold text-foreground mb-3">Rezeptanfragen</h3>
+          <SectionHeading
+            title="Rezeptanfragen"
+            commentKey="rezept"
+            comment={data.comments?.rezept || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <ServiceToggle
             label="Rezeptanfragen"
             checked={data.rezeptAnfrage}
@@ -108,11 +119,10 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Regeln">
-                <Textarea
+                <RichTextEditor
                   value={data.rezeptRegeln}
-                  onChange={(e) => onChange({ rezeptRegeln: e.target.value })}
+                  onChange={(v) => onChange({ rezeptRegeln: v })}
                   placeholder="z.B. Medikament muss bereits verordnet worden sein; Wenn nicht verordnet → Terminvereinbarung"
-                  rows={3}
                 />
               </FormField>
             </div>
@@ -127,21 +137,20 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Zustellung" hint="Wie kommt der Patient an das Rezept? (z.B. Post, Abholung, medflex, Mail)">
-                <Textarea
+                <RichTextEditor
                   value={data.rezeptZustellung}
-                  onChange={(e) => onChange({ rezeptZustellung: e.target.value })}
+                  onChange={(v) => onChange({ rezeptZustellung: v })}
                   placeholder="z.B. GKV: E-Rezept auf Gesundheitskarte; PKV: Abholen oder per Post"
-                  rows={3}
                 />
               </FormField>
             </div>
             <div className="mt-3">
               <FormField label="Gesprächsabschluss">
-                <Textarea
+                <RichTextEditor
                   value={data.rezeptGespraechsabschluss}
-                  onChange={(e) => onChange({ rezeptGespraechsabschluss: e.target.value })}
+                  onChange={(v) => onChange({ rezeptGespraechsabschluss: v })}
                   placeholder="z.B. Ihre Rezeptanfrage wurde aufgenommen. Das Rezept wird wie besprochen bereitgestellt."
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -159,7 +168,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
 
         {/* Befund */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Befund anfordern</h3>
+          <SectionHeading
+            title="Befund anfordern"
+            commentKey="befund"
+            comment={data.comments?.befund || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <ServiceToggle
             label="Befundanfragen"
             checked={data.befundAnfrage}
@@ -178,11 +193,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Regeln">
-                <Textarea
+                <RichTextEditor
                   value={data.befundRegeln}
-                  onChange={(e) => onChange({ befundRegeln: e.target.value })}
+                  onChange={(v) => onChange({ befundRegeln: v })}
                   placeholder="z.B. Ärztliche Kollegen werden direkt durchgestellt"
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -197,11 +212,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Gesprächsabschluss">
-                <Textarea
+                <RichTextEditor
                   value={data.befundGespraechsabschluss}
-                  onChange={(e) => onChange({ befundGespraechsabschluss: e.target.value })}
+                  onChange={(v) => onChange({ befundGespraechsabschluss: v })}
                   placeholder="z.B. Ihre Befundanfrage wurde aufgenommen."
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -219,7 +234,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
 
         {/* Überweisung */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Überweisungen</h3>
+          <SectionHeading
+            title="Überweisungen"
+            commentKey="ueberweisung"
+            comment={data.comments?.ueberweisung || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <ServiceToggle
             label="Überweisungsanfragen"
             checked={data.ueberweisung}
@@ -256,11 +277,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Gesprächsabschluss">
-                <Textarea
+                <RichTextEditor
                   value={data.ueberweisungGespraechsabschluss}
-                  onChange={(e) => onChange({ ueberweisungGespraechsabschluss: e.target.value })}
+                  onChange={(v) => onChange({ ueberweisungGespraechsabschluss: v })}
                   placeholder="z.B. Ihre Überweisungsanfrage wurde aufgenommen."
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -278,7 +299,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
 
         {/* AU / Krankschreibung */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">AU / Krankschreibung</h3>
+          <SectionHeading
+            title="AU / Krankschreibung"
+            commentKey="au"
+            comment={data.comments?.au || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <ServiceToggle
             label="AU-Anfragen"
             checked={data.auKrankschreibung}
@@ -288,11 +315,10 @@ const StepDocuments = ({ data, onChange }: Props) => {
           >
             <div className="mt-3">
               <FormField label="Regeln" hint="z.B. Erst-AU → Terminvereinbarung, Folge-AU → Datenerfassung">
-                <Textarea
+                <RichTextEditor
                   value={data.auRegeln}
-                  onChange={(e) => onChange({ auRegeln: e.target.value })}
+                  onChange={(v) => onChange({ auRegeln: v })}
                   placeholder="z.B. Erst-AU: Weiter mit Terminvereinbarung; Folge-AU vom MVZ: Datenerfassung"
-                  rows={3}
                 />
               </FormField>
             </div>
@@ -307,11 +333,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
             </div>
             <div className="mt-3">
               <FormField label="Gesprächsabschluss">
-                <Textarea
+                <RichTextEditor
                   value={data.auGespraechsabschluss}
-                  onChange={(e) => onChange({ auGespraechsabschluss: e.target.value })}
+                  onChange={(v) => onChange({ auGespraechsabschluss: v })}
                   placeholder="z.B. Ihre AU-Anfrage wurde aufgenommen."
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -327,10 +353,15 @@ const StepDocuments = ({ data, onChange }: Props) => {
           </ServiceToggle>
         </div>
 
-        {/* Weitere Anliegen (erweiterbar) */}
+        {/* Weitere Anliegen */}
         <div className="border-t border-border pt-5">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold text-foreground">Weitere Anliegen</h3>
+            <SectionHeading
+              title="Weitere Anliegen"
+              commentKey="weitereAnliegen"
+              comment={data.comments?.weitereAnliegen || ''}
+              onCommentChange={setComment}
+            />
             <Button variant="outline" size="sm" onClick={addAnliegen} className="gap-1.5">
               <Plus className="w-4 h-4" />
               Hinzufügen
@@ -380,11 +411,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
                       />
                     </FormField>
                     <FormField label="Regeln">
-                      <Textarea
+                      <RichTextEditor
                         value={item.regeln}
-                        onChange={(e) => updateAnliegen(index, { regeln: e.target.value })}
+                        onChange={(v) => updateAnliegen(index, { regeln: v })}
                         placeholder="Spezielle Regeln für dieses Anliegen"
-                        rows={2}
+                        minHeight="50px"
                       />
                     </FormField>
                     <FormField label="Datenerfassung">
@@ -395,10 +426,10 @@ const StepDocuments = ({ data, onChange }: Props) => {
                       />
                     </FormField>
                     <FormField label="Gesprächsabschluss">
-                      <Textarea
+                      <RichTextEditor
                         value={item.gespraechsabschluss}
-                        onChange={(e) => updateAnliegen(index, { gespraechsabschluss: e.target.value })}
-                        rows={2}
+                        onChange={(v) => updateAnliegen(index, { gespraechsabschluss: v })}
+                        minHeight="50px"
                       />
                     </FormField>
                     <FormField label="Tag(s)">
@@ -417,7 +448,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
 
         {/* Sonstiges */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Sonstiges Anliegen</h3>
+          <SectionHeading
+            title="Sonstiges Anliegen"
+            commentKey="sonstiges"
+            comment={data.comments?.sonstiges || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <FormField label="Sonstige Anliegen annehmen?">
             <div className="flex items-center gap-3">
               <Switch
@@ -432,11 +469,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
           {data.sonstigesAnliegen && (
             <div className="mt-3">
               <FormField label="Gesprächsabschluss">
-                <Textarea
+                <RichTextEditor
                   value={data.sonstigesGespraechsabschluss}
-                  onChange={(e) => onChange({ sonstigesGespraechsabschluss: e.target.value })}
+                  onChange={(v) => onChange({ sonstigesGespraechsabschluss: v })}
                   placeholder="z.B. Vielen Dank, Ihr Anliegen wurde aufgenommen."
-                  rows={2}
+                  minHeight="50px"
                 />
               </FormField>
             </div>
@@ -445,7 +482,13 @@ const StepDocuments = ({ data, onChange }: Props) => {
 
         {/* Weiterleitung */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Weiterleitung bei persönlichem Gesprächswunsch</h3>
+          <SectionHeading
+            title="Weiterleitung bei persönlichem Gesprächswunsch"
+            commentKey="weiterleitung"
+            comment={data.comments?.weiterleitung || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
           <FormField label="Weiterleitung anbieten?" hint="Wenn der Anrufer ein persönliches Gespräch wünscht">
             <div className="flex items-center gap-3">
               <Switch
@@ -470,11 +513,11 @@ const StepDocuments = ({ data, onChange }: Props) => {
               </div>
               <div className="mt-3">
                 <FormField label="Regeln" hint="z.B. Schlagwort oder Bedingung für Weiterleitung">
-                  <Textarea
+                  <RichTextEditor
                     value={data.weiterleitungRegeln}
-                    onChange={(e) => onChange({ weiterleitungRegeln: e.target.value })}
+                    onChange={(v) => onChange({ weiterleitungRegeln: v })}
                     placeholder="z.B. Weiterleitung nur bei Nennung des Schlagworts ‚persönlich' oder ‚dringend'"
-                    rows={2}
+                    minHeight="50px"
                   />
                 </FormField>
               </div>

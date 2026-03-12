@@ -81,6 +81,64 @@ const Index = () => {
     e.target.value = '';
   }, []);
 
+  // ── HTML to plain text helper ──
+  const htmlToPlain = (html: string): string => {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
+  // ── HTML to structured lines for PDF ──
+  const htmlToLines = (html: string): { text: string; bold?: boolean; bullet?: boolean; ordered?: number }[] => {
+    if (!html) return [];
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    const lines: { text: string; bold?: boolean; bullet?: boolean; ordered?: number }[] = [];
+
+    const processNode = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.textContent?.trim();
+        if (text) {
+          const parentBold = (node.parentElement?.tagName === 'B' || node.parentElement?.tagName === 'STRONG');
+          lines.push({ text, bold: parentBold });
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const el = node as HTMLElement;
+        const tag = el.tagName;
+        if (tag === 'LI') {
+          const isBold = el.querySelector('b, strong') !== null;
+          const text = el.textContent?.trim() || '';
+          const parentList = el.parentElement?.tagName;
+          if (parentList === 'OL') {
+            const idx = Array.from(el.parentElement!.children).indexOf(el) + 1;
+            lines.push({ text, ordered: idx, bold: isBold });
+          } else {
+            lines.push({ text, bullet: true, bold: isBold });
+          }
+        } else if (tag === 'UL' || tag === 'OL') {
+          el.childNodes.forEach(processNode);
+        } else if (tag === 'B' || tag === 'STRONG') {
+          const text = el.textContent?.trim();
+          if (text) lines.push({ text, bold: true });
+        } else if (tag === 'BR') {
+          // skip
+        } else if (tag === 'DIV' || tag === 'P') {
+          el.childNodes.forEach(processNode);
+        } else {
+          el.childNodes.forEach(processNode);
+        }
+      }
+    };
+
+    tmp.childNodes.forEach(processNode);
+    if (lines.length === 0) {
+      const plain = htmlToPlain(html);
+      if (plain) lines.push({ text: plain });
+    }
+    return lines;
+  };
+
   // ── PDF Export ──
   const exportPdf = useCallback(async () => {
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -119,6 +177,22 @@ const Index = () => {
       y += 12;
     };
 
+    const addComment = (key: string) => {
+      const comment = data.comments?.[key];
+      if (comment && comment.trim()) {
+        checkPage(12);
+        doc.setFillColor(255, 250, 230);
+        const commentLines = doc.splitTextToSize(`💬 ${comment}`, contentWidth - 10);
+        const height = commentLines.length * 4.5 + 4;
+        doc.rect(margin + 2, y - 2, contentWidth - 4, height, 'F');
+        doc.setTextColor(120, 100, 50);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'italic');
+        doc.text(commentLines, margin + 5, y + 2);
+        y += height + 2;
+      }
+    };
+
     const addRow = (label: string, value: string) => {
       checkPage(10);
       doc.setTextColor(100, 110, 120);
@@ -127,9 +201,36 @@ const Index = () => {
       doc.text(label, margin + 3, y);
       doc.setTextColor(30, 40, 50);
       doc.setFont('helvetica', 'bold');
-      const lines = doc.splitTextToSize(value || '–', contentWidth - 65);
+      const plainValue = htmlToPlain(value) || '–';
+      const lines = doc.splitTextToSize(plainValue, contentWidth - 65);
       doc.text(lines, margin + 60, y);
       y += Math.max(lines.length * 5, 7);
+    };
+
+    const addRichText = (label: string, html: string) => {
+      if (!html) return;
+      checkPage(10);
+      doc.setTextColor(100, 110, 120);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.text(label, margin + 3, y);
+      y += 5;
+
+      const items = htmlToLines(html);
+      for (const item of items) {
+        checkPage(6);
+        doc.setTextColor(30, 40, 50);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
+        let prefix = '';
+        let indent = margin + 5;
+        if (item.bullet) { prefix = '• '; indent = margin + 8; }
+        else if (item.ordered) { prefix = `${item.ordered}. `; indent = margin + 8; }
+        const lines = doc.splitTextToSize(prefix + item.text, contentWidth - (indent - margin) - 5);
+        doc.text(lines, indent, y);
+        y += lines.length * 4.5;
+      }
+      y += 2;
     };
 
     addHeader();
@@ -148,24 +249,31 @@ const Index = () => {
     addRow('Datenschutz Website', data.datenschutzWebsite ? 'Ja' : 'Nein');
     addRow('Datenschutz Ansage', data.datenschutzAnsage ? 'Ja' : 'Nein');
     addRow('Hinweis 112', data.hinweis112 ? 'Ja' : 'Nein');
-    if (data.begruessung) addRow('Begrüßung', data.begruessung);
+    if (data.begruessung) addRichText('Begrüßung', data.begruessung);
 
     addSection('Anrufer-Typen');
+    addComment('patientenaufnahme');
     addRow('Versicherungsarten', data.versicherungsarten.join(', '));
     addRow('Patientendaten', data.patientendatenFelder.join(', '));
     if (data.prioTags.length > 0) addRow('Prioritäts-Tags', data.prioTags.join(', '));
+    addComment('neupatienten');
     addRow('Neupatienten', data.neupatientenAufnahme ? 'Ja' : 'Nein');
-    if (data.neupatientenRegeln) addRow('Neupatientenregeln', data.neupatientenRegeln);
+    if (data.neupatientenRegeln) addRichText('Neupatientenregeln', data.neupatientenRegeln);
+    addComment('vertreter');
     addRow('Vertreter', data.vertreterHandling ? 'Ja' : 'Nein');
     if (data.vertreterHandling) addRow('Vertreterdaten', data.vertreterDatenerfassung.join(', '));
+    addComment('zuweiser');
     addRow('Zuweiser durchstellen', data.zuweiserDurchstellen ? 'Ja' : 'Nein');
     if (data.zuweiserDurchstellen && data.zuweiserTelefon) addRow('Zuweiser-Telefon', data.zuweiserTelefon);
+    addComment('rueckrufer');
     addRow('Rückrufer-Handling', data.rueckruferHandling ? 'Ja' : 'Nein');
     if (data.rueckruferHandling && data.rueckruferDurchstellen && data.rueckruferTelefon) addRow('Rückrufer-Telefon', data.rueckruferTelefon);
+    addComment('bgFall');
     addRow('BG-Fall Behandlung', data.bgFallHandling ? 'Ja' : 'Nein');
-    if (data.bgFallHinweis) addRow('BG-Fall Hinweis', data.bgFallHinweis);
+    if (data.bgFallHinweis) addRichText('BG-Fall Hinweis', data.bgFallHinweis);
 
     addSection('Notfallbearbeitung');
+    addComment('notfallbearbeitung');
     addRow('Intern bearbeitet', data.notfaelleIntern ? 'Ja' : 'Nein');
     addRow('Schlüsselwörter', data.notfallSchlagwoerter.join(', '));
     if (data.notfallTelefon) addRow('Notfallnummer', data.notfallTelefon);
@@ -174,54 +282,65 @@ const Index = () => {
 
     addSection('Terminmanagement');
     if (data.onlineBuchungHinweis) addRow('Online-Buchung', data.onlineBuchungHinweis);
+    addComment('terminanfrage');
     addRow('Terminanfrage', data.terminAnfrage ? 'Ja' : 'Nein');
     if (!data.terminAnfrage && data.terminAnfrageAlternative) addRow('Alternative', data.terminAnfrageAlternative);
     if (data.terminAnfrage) {
       addRow('Terminarten', data.terminarten.join(', '));
       addRow('Verfügbar für', data.terminVerfuegbarFuer.join(', '));
       addRow('Datenerfassung', data.terminDatenerfassung.join(', '));
-      if (data.terminRegeln) addRow('Terminregeln', data.terminRegeln);
-      if (data.terminGespraechsabschluss) addRow('Gesprächsabschluss', data.terminGespraechsabschluss);
+      if (data.terminRegeln) addRichText('Terminregeln', data.terminRegeln);
+      if (data.terminGespraechsabschluss) addRichText('Gesprächsabschluss', data.terminGespraechsabschluss);
       if (data.terminTags.length > 0) addRow('Tags', data.terminTags.join(', '));
     }
+    addComment('terminabsage');
     addRow('Terminabsage/-änderung', data.terminAbsage ? 'Ja' : 'Nein');
-    if (data.terminAbsage && data.terminAbsageRegeln) addRow('Absage-Regeln', data.terminAbsageRegeln);
+    if (data.terminAbsage && data.terminAbsageRegeln) addRichText('Absage-Regeln', data.terminAbsageRegeln);
 
     addSection('Dokumente & Weiteres');
+    addComment('rezept');
     addRow('Rezeptanfragen', data.rezeptAnfrage ? 'Ja' : 'Nein');
     if (data.rezeptAnfrage) {
       addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
-      if (data.rezeptRegeln) addRow('Rezeptregeln', data.rezeptRegeln);
+      if (data.rezeptRegeln) addRichText('Rezeptregeln', data.rezeptRegeln);
       addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
-      if (data.rezeptZustellung) addRow('Zustellung', data.rezeptZustellung);
+      if (data.rezeptZustellung) addRichText('Zustellung', data.rezeptZustellung);
     }
+    addComment('befund');
     addRow('Befundanfragen', data.befundAnfrage ? 'Ja' : 'Nein');
     if (data.befundAnfrage) {
       addRow('Befund für', data.befundVerfuegbar.join(', '));
       addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
     }
+    addComment('ueberweisung');
     addRow('Überweisung', data.ueberweisung ? 'Ja' : 'Nein');
     if (data.ueberweisung) {
       if (data.ueberweisungVerfuegbar.length > 0) addRow('Verfügbar für', data.ueberweisungVerfuegbar.join(', '));
       if (data.ueberweisungZustellung) addRow('Zustellung', data.ueberweisungZustellung);
     }
+    addComment('au');
     addRow('AU / Krankschreibung', data.auKrankschreibung ? 'Ja' : 'Nein');
-    if (data.auKrankschreibung && data.auRegeln) addRow('AU-Regeln', data.auRegeln);
+    if (data.auKrankschreibung && data.auRegeln) addRichText('AU-Regeln', data.auRegeln);
     if (data.weitereAnliegen.length > 0) {
+      addComment('weitereAnliegen');
       addRow('Weitere Anliegen', data.weitereAnliegen.map(a => a.name).filter(Boolean).join(', '));
     }
+    addComment('sonstiges');
     addRow('Sonstiges', data.sonstigesAnliegen ? 'Ja' : 'Nein');
+    addComment('weiterleitung');
     addRow('Weiterleitung Gespräch', data.weiterleitungBeiGespraech ? 'Ja' : 'Nein');
     if (data.weiterleitungBeiGespraech && data.weiterleitungTelefon) addRow('Weiterleitungs-Nr.', data.weiterleitungTelefon);
 
     addSection('Knowledge Base');
-    addRow('Adresse', data.adresse);
-    if (data.anfahrt) addRow('Anfahrt', data.anfahrt);
-    addRow('Öffnungszeiten', data.oeffnungszeiten);
-    addRow('Parkhinweise', data.parkhinweise);
-    addRow('Behandler', data.behandlerListe);
-    addRow('Leistungen', data.leistungen);
-    addRow('Besonderheiten', data.besonderheiten);
+    addComment('knowledgeStandort');
+    addRichText('Adresse', data.adresse);
+    if (data.anfahrt) addRichText('Anfahrt', data.anfahrt);
+    addRichText('Öffnungszeiten', data.oeffnungszeiten);
+    addRichText('Parkhinweise', data.parkhinweise);
+    addComment('knowledgeTeam');
+    addRichText('Behandler', data.behandlerListe);
+    addRichText('Leistungen', data.leistungen);
+    addRichText('Besonderheiten', data.besonderheiten);
 
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {

@@ -128,6 +128,9 @@ export interface OnboardingData {
   behandlerListe: string;
   leistungen: string;
   besonderheiten: string;
+
+  // Kommentare (intern)
+  comments: Record<string, string>;
 }
 
 export interface WeitereAnliegenItem {
@@ -249,6 +252,8 @@ export const defaultOnboardingData: OnboardingData = {
   behandlerListe: '',
   leistungen: '',
   besonderheiten: '',
+
+  comments: {},
 };
 
 export const MLFX_VERSION = '1.2';

@@ -1,8 +1,9 @@
 import { OnboardingData } from '@/types/onboarding';
 import StepCard from './StepCard';
 import FormField from './FormField';
+import SectionHeading from './SectionHeading';
+import RichTextEditor from './RichTextEditor';
 import TagInput from './TagInput';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import stepImage from '@/assets/step-appointments.jpg';
@@ -13,6 +14,10 @@ interface Props {
 }
 
 const StepAppointments = ({ data, onChange }: Props) => {
+  const setComment = (key: string, value: string) => {
+    onChange({ comments: { ...data.comments, [key]: value } });
+  };
+
   return (
     <StepCard
       title="Terminmanagement"
@@ -20,7 +25,7 @@ const StepAppointments = ({ data, onChange }: Props) => {
       image={stepImage}
     >
       <div className="space-y-6">
-        {/* Online-Buchungshinweis (an den Anfang) */}
+        {/* Online-Buchungshinweis */}
         <FormField label="Online-Buchungshinweis" hint="Hinweis auf Online-Terminbuchung (z.B. Doctolib, Jameda)">
           <Input
             value={data.onlineBuchungHinweis}
@@ -31,7 +36,13 @@ const StepAppointments = ({ data, onChange }: Props) => {
 
         {/* Terminanfrage */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Terminanfrage</h3>
+          <SectionHeading
+            title="Terminanfrage"
+            commentKey="terminanfrage"
+            comment={data.comments?.terminanfrage || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
 
           <FormField label="Terminanfragen anbieten?">
             <div className="flex items-center gap-3">
@@ -81,11 +92,10 @@ const StepAppointments = ({ data, onChange }: Props) => {
 
               <div className="mt-3">
                 <FormField label="Regeln" hint="z.B. Überweisungspflicht, Versicherungseinschränkungen">
-                  <Textarea
+                  <RichTextEditor
                     value={data.terminRegeln}
-                    onChange={(e) => onChange({ terminRegeln: e.target.value })}
+                    onChange={(v) => onChange({ terminRegeln: v })}
                     placeholder="z.B. Neupatienten GKV nur mit Überweisung; Sportmedizin nur für Privat und Selbstzahler"
-                    rows={3}
                   />
                 </FormField>
               </div>
@@ -102,11 +112,10 @@ const StepAppointments = ({ data, onChange }: Props) => {
 
               <div className="mt-3">
                 <FormField label="Gesprächsabschluss" hint="Was soll der Assistent am Ende des Gesprächs sagen?">
-                  <Textarea
+                  <RichTextEditor
                     value={data.terminGespraechsabschluss}
-                    onChange={(e) => onChange({ terminGespraechsabschluss: e.target.value })}
+                    onChange={(v) => onChange({ terminGespraechsabschluss: v })}
                     placeholder="z.B. Vielen Dank, Ihre Terminanfrage wurde aufgenommen. Wir melden uns zeitnah bei Ihnen."
-                    rows={3}
                   />
                 </FormField>
               </div>
@@ -126,7 +135,13 @@ const StepAppointments = ({ data, onChange }: Props) => {
 
         {/* Termin absagen/ändern */}
         <div className="border-t border-border pt-5">
-          <h3 className="text-lg font-semibold text-foreground mb-3">Terminabsage / -änderung</h3>
+          <SectionHeading
+            title="Terminabsage / -änderung"
+            commentKey="terminabsage"
+            comment={data.comments?.terminabsage || ''}
+            onCommentChange={setComment}
+            className="mb-3"
+          />
 
           <FormField label="Terminabsage/-änderung anbieten?">
             <div className="flex items-center gap-3">
@@ -156,11 +171,11 @@ const StepAppointments = ({ data, onChange }: Props) => {
             <>
               <div className="mt-3">
                 <FormField label="Regeln" hint="z.B. Stornierungsgebühren, Fristen">
-                  <Textarea
+                  <RichTextEditor
                     value={data.terminAbsageRegeln}
-                    onChange={(e) => onChange({ terminAbsageRegeln: e.target.value })}
+                    onChange={(v) => onChange({ terminAbsageRegeln: v })}
                     placeholder="z.B. Absage bis 24h vorher kostenlos; danach ggf. Ausfallhonorar"
-                    rows={2}
+                    minHeight="50px"
                   />
                 </FormField>
               </div>
@@ -177,11 +192,11 @@ const StepAppointments = ({ data, onChange }: Props) => {
 
               <div className="mt-3">
                 <FormField label="Gesprächsabschluss">
-                  <Textarea
+                  <RichTextEditor
                     value={data.terminAbsageGespraechsabschluss}
-                    onChange={(e) => onChange({ terminAbsageGespraechsabschluss: e.target.value })}
+                    onChange={(v) => onChange({ terminAbsageGespraechsabschluss: v })}
                     placeholder="z.B. Ihr Termin wurde zur Absage vorgemerkt. Das Praxisteam wird sich ggf. bei Ihnen melden."
-                    rows={2}
+                    minHeight="50px"
                   />
                 </FormField>
               </div>
