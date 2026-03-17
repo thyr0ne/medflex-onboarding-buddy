@@ -286,50 +286,85 @@ const Index = () => {
     addRow('Terminanfrage', data.terminAnfrage ? 'Ja' : 'Nein');
     if (!data.terminAnfrage && data.terminAnfrageAlternative) addRow('Alternative', data.terminAnfrageAlternative);
     if (data.terminAnfrage) {
-      addRow('Terminarten', data.terminarten.join(', '));
-      addRow('Verfügbar für', data.terminVerfuegbarFuer.join(', '));
-      addRow('Datenerfassung', data.terminDatenerfassung.join(', '));
+      if (data.terminarten.length > 0) addRow('Terminarten', data.terminarten.join(', '));
+      if (data.terminVerfuegbarFuer.length > 0) addRow('Verfügbar für', data.terminVerfuegbarFuer.join(', '));
+      if (data.terminDatenerfassung.length > 0) addRow('Datenerfassung', data.terminDatenerfassung.join(', '));
       if (data.terminRegeln) addRichText('Terminregeln', data.terminRegeln);
       if (data.terminGespraechsabschluss) addRichText('Gesprächsabschluss', data.terminGespraechsabschluss);
       if (data.terminTags.length > 0) addRow('Tags', data.terminTags.join(', '));
     }
     addComment('terminabsage');
     addRow('Terminabsage/-änderung', data.terminAbsage ? 'Ja' : 'Nein');
-    if (data.terminAbsage && data.terminAbsageRegeln) addRichText('Absage-Regeln', data.terminAbsageRegeln);
+    if (!data.terminAbsage && data.terminAbsageAlternative) addRow('Alternative', data.terminAbsageAlternative);
+    if (data.terminAbsage) {
+      if (data.terminAbsageRegeln) addRichText('Absage-Regeln', data.terminAbsageRegeln);
+      if (data.terminAbsageDatenerfassung.length > 0) addRow('Absage-Datenerfassung', data.terminAbsageDatenerfassung.join(', '));
+      if (data.terminAbsageGespraechsabschluss) addRichText('Absage-Gesprächsabschluss', data.terminAbsageGespraechsabschluss);
+      if (data.terminAbsageTags.length > 0) addRow('Absage-Tags', data.terminAbsageTags.join(', '));
+    }
 
     addSection('Dokumente & Weiteres');
     addComment('rezept');
     addRow('Rezeptanfragen', data.rezeptAnfrage ? 'Ja' : 'Nein');
+    if (!data.rezeptAnfrage && data.rezeptAlternative) addRow('Alternative', data.rezeptAlternative);
     if (data.rezeptAnfrage) {
-      addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
+      if (data.rezeptVerfuegbar.length > 0) addRow('Rezept für', data.rezeptVerfuegbar.join(', '));
       if (data.rezeptRegeln) addRichText('Rezeptregeln', data.rezeptRegeln);
-      addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
+      if (data.rezeptDatenerfassung.length > 0) addRow('Rezept-Datenerfassung', data.rezeptDatenerfassung.join(', '));
       if (data.rezeptZustellung) addRichText('Zustellung', data.rezeptZustellung);
+      if (data.rezeptGespraechsabschluss) addRichText('Rezept-Gesprächsabschluss', data.rezeptGespraechsabschluss);
+      if (data.rezeptTags.length > 0) addRow('Rezept-Tags', data.rezeptTags.join(', '));
     }
     addComment('befund');
     addRow('Befundanfragen', data.befundAnfrage ? 'Ja' : 'Nein');
+    if (!data.befundAnfrage && data.befundAlternative) addRow('Alternative', data.befundAlternative);
     if (data.befundAnfrage) {
-      addRow('Befund für', data.befundVerfuegbar.join(', '));
-      addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
+      if (data.befundVerfuegbar.length > 0) addRow('Befund für', data.befundVerfuegbar.join(', '));
+      if (data.befundRegeln) addRichText('Befund-Regeln', data.befundRegeln);
+      if (data.befundDatenerfassung.length > 0) addRow('Befund-Datenerfassung', data.befundDatenerfassung.join(', '));
+      if (data.befundGespraechsabschluss) addRichText('Befund-Gesprächsabschluss', data.befundGespraechsabschluss);
+      if (data.befundTags.length > 0) addRow('Befund-Tags', data.befundTags.join(', '));
     }
     addComment('ueberweisung');
     addRow('Überweisung', data.ueberweisung ? 'Ja' : 'Nein');
+    if (!data.ueberweisung && data.ueberweisungAlternative) addRow('Alternative', data.ueberweisungAlternative);
     if (data.ueberweisung) {
       if (data.ueberweisungVerfuegbar.length > 0) addRow('Verfügbar für', data.ueberweisungVerfuegbar.join(', '));
+      if (data.ueberweisungRegeln) addRichText('Überweisungs-Regeln', data.ueberweisungRegeln);
+      if (data.ueberweisungDatenerfassung.length > 0) addRow('Überweisungs-Datenerfassung', data.ueberweisungDatenerfassung.join(', '));
       if (data.ueberweisungZustellung) addRow('Zustellung', data.ueberweisungZustellung);
+      if (data.ueberweisungGespraechsabschluss) addRichText('Überweisungs-Gesprächsabschluss', data.ueberweisungGespraechsabschluss);
+      if (data.ueberweisungTags.length > 0) addRow('Überweisungs-Tags', data.ueberweisungTags.join(', '));
     }
     addComment('au');
     addRow('AU / Krankschreibung', data.auKrankschreibung ? 'Ja' : 'Nein');
-    if (data.auKrankschreibung && data.auRegeln) addRichText('AU-Regeln', data.auRegeln);
+    if (!data.auKrankschreibung && data.auAlternative) addRow('Alternative', data.auAlternative);
+    if (data.auKrankschreibung) {
+      if (data.auRegeln) addRichText('AU-Regeln', data.auRegeln);
+      if (data.auDatenerfassung.length > 0) addRow('AU-Datenerfassung', data.auDatenerfassung.join(', '));
+      if (data.auGespraechsabschluss) addRichText('AU-Gesprächsabschluss', data.auGespraechsabschluss);
+      if (data.auTags.length > 0) addRow('AU-Tags', data.auTags.join(', '));
+    }
     if (data.weitereAnliegen.length > 0) {
       addComment('weitereAnliegen');
-      addRow('Weitere Anliegen', data.weitereAnliegen.map(a => a.name).filter(Boolean).join(', '));
+      for (const anliegen of data.weitereAnliegen) {
+        if (anliegen.name) {
+          addRow('Weiteres Anliegen', anliegen.name);
+          if (anliegen.verfuegbarFuer.length > 0) addRow('  Verfügbar für', anliegen.verfuegbarFuer.join(', '));
+          if (anliegen.regeln) addRichText('  Regeln', anliegen.regeln);
+          if (anliegen.datenerfassung.length > 0) addRow('  Datenerfassung', anliegen.datenerfassung.join(', '));
+          if (anliegen.gespraechsabschluss) addRichText('  Gesprächsabschluss', anliegen.gespraechsabschluss);
+          if (anliegen.tags.length > 0) addRow('  Tags', anliegen.tags.join(', '));
+        }
+      }
     }
     addComment('sonstiges');
     addRow('Sonstiges', data.sonstigesAnliegen ? 'Ja' : 'Nein');
+    if (data.sonstigesGespraechsabschluss) addRichText('Sonstiges-Gesprächsabschluss', data.sonstigesGespraechsabschluss);
     addComment('weiterleitung');
     addRow('Weiterleitung Gespräch', data.weiterleitungBeiGespraech ? 'Ja' : 'Nein');
     if (data.weiterleitungBeiGespraech && data.weiterleitungTelefon) addRow('Weiterleitungs-Nr.', data.weiterleitungTelefon);
+    if (data.weiterleitungBeiGespraech && data.weiterleitungRegeln) addRichText('Weiterleitungs-Regeln', data.weiterleitungRegeln);
 
     addSection('Knowledge Base');
     addComment('knowledgeStandort');
