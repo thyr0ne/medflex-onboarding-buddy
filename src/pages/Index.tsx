@@ -180,16 +180,21 @@ const Index = () => {
     const addComment = (key: string) => {
       const comment = data.comments?.[key];
       if (comment && comment.trim()) {
-        checkPage(12);
+        const cleanComment = comment.replace(/<[^>]*>/g, '').trim();
+        if (!cleanComment) return;
+        checkPage(14);
         doc.setFillColor(255, 250, 230);
-        const commentLines = doc.splitTextToSize(`💬 ${comment}`, contentWidth - 10);
-        const height = commentLines.length * 4.5 + 4;
-        doc.rect(margin + 2, y - 2, contentWidth - 4, height, 'F');
-        doc.setTextColor(120, 100, 50);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        doc.text(commentLines, margin + 5, y + 2);
+        const commentLines = doc.splitTextToSize('Kommentar: ' + cleanComment, contentWidth - 14);
+        const height = commentLines.length * 4.5 + 6;
+        doc.rect(margin + 2, y - 2, contentWidth - 4, height, 'F');
+        doc.setTextColor(120, 100, 50);
+        doc.text(commentLines, margin + 7, y + 2);
         y += height + 2;
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(60, 60, 60);
+        doc.setFontSize(9);
       }
     };
 
